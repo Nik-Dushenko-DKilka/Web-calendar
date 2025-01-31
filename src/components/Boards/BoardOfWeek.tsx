@@ -70,6 +70,8 @@ const BoardOfWeek = ({
   const [listOfDailyEvents, setListOfDailyEvents] =
     useState<ListOfDailyEvents>();
 
+  console.log(listOfDailyEvents);
+
   const {
     calculateEventsForWeek,
     calculateCollisions,

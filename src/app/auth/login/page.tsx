@@ -7,7 +7,7 @@ const Login = () => {
       <Image
         src={"/svg/logo.svg"}
         alt="logo icon"
-        className="w-1/2 block self-center"
+        className="w-1/2 block self-center h-16"
         width={0}
         height={0}
       ></Image>
