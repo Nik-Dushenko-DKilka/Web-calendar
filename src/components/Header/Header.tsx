@@ -1,9 +1,16 @@
 "use client";
 import Image from "next/image";
+import { Mystery_Quest } from "next/font/google";
 
 import Button from "@/components/Button/Button";
 import Dropdown from "../DropDown/Dropdown";
 import { addDays, addWeeks, format, subDays, subWeeks } from "date-fns";
+import ToggleTheme from "../ToggleTheme/ToggleTheme";
+
+const mysteryFont = Mystery_Quest({
+  subsets: ["latin"],
+  weight: "400",
+});
 
 interface HeaderProps {
   currentDate: Date;
@@ -36,14 +43,17 @@ const Header = ({
   };
 
   return (
-    <header className="border-b-2 shadow-md flex flex-row relative bg-white">
+    <header className="border-b-2 shadow-md flex flex-row relative bg-white dark:bg-[#2c2e41] dark:border-none">
       <Image
-        src={"/svg/logo.svg"}
+        src={"/svg/light-logo.svg"}
         alt="logo icon"
-        className="w-52 h-auto my-4 ml-6"
+        className="w-16 h-16 self-center ml-6"
         width={0}
         height={0}
       ></Image>
+      <h2 className={`${mysteryFont.className} text-4xl self-center`}>
+        Synckil
+      </h2>
       <Button
         text="Today"
         onClick={() => setCurrentDate(new Date())}
@@ -75,8 +85,8 @@ const Header = ({
         onChange={() => setIsDayView(!isDayView)}
         style="self-center absolute right-56"
       />
+      <ToggleTheme />
       <div className="self-center absolute right-12 flex flex-row">
-        {/* Todo: add username and icon from auth */}
         <span className="self-center">{"Username"}</span>
         <Image
           src={"svg/cross-icon.svg"}

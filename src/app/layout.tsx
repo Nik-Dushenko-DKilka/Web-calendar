@@ -1,8 +1,8 @@
+import { Providers } from "./providers";
+
 import { Inter } from "next/font/google";
 
 import "@/styles/globals.css";
-import { Provider } from "react-redux";
-import { store } from "@/store/store";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,9 +18,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className + " bg-[#F2F5F7] overflow-hidden"}>
-        <Provider store={store}>{children}</Provider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className + "overflow-hidden"}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

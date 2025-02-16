@@ -137,7 +137,7 @@ const CalendarBoard = ({
         setEvents: setEvents,
       }}
     >
-      <main className="mt-8 mr-12 ml-8 flex">
+      <main className="pt-8 pr-12 pl-8 flex bg-[#fffcdc] dark:bg-[#000323]">
         <Event
           editable={editable}
           calendars={calendars}
@@ -159,7 +159,7 @@ const CalendarBoard = ({
           setCalendars={setCalendars}
         />
 
-        <aside className="flex flex-col w-1/6">
+        <aside className="flex flex-col w-1/6 ">
           <Button
             text="+ Create"
             onClick={() => setEventIsVisible(!eventIsVisible)}
@@ -172,12 +172,12 @@ const CalendarBoard = ({
               setCurrentDate(parseISO(e.target.value))
             }
           />
-          <div className="bg-white rounded-lg p-4 mt-4">
+          <div className="bg-white dark:bg-[#2c2e41] rounded-lg p-4 mt-4">
             <div className="flex justify-between">
               <h2 className="font-bold">My calendars</h2>
               <Button
                 icon="/svg/plus-icon.svg"
-                style="border-none -mt-2.5 hover:bg-white"
+                style="border-none dark:bg-transparent dark:invert -mt-2.5 hover:bg-white"
                 isPrimary={false}
                 onClick={createCalendar}
               />
@@ -186,7 +186,7 @@ const CalendarBoard = ({
               return (
                 <div
                   key={el.id}
-                  className="flex hover:bg-[#EFEFEF] p-2 pr-0 rounded-lg"
+                  className="flex hover:bg-[#EFEFEF] dark:hover:bg-[#000323] cursor-pointer p-2 pr-0 rounded-lg"
                 >
                   <Checkbox
                     checkboxColor={el.color}
@@ -202,13 +202,13 @@ const CalendarBoard = ({
                     icon={"svg/delete-icon.svg"}
                     onClick={() => deleteCalendar(el.id)}
                     isPrimary={false}
-                    style="border-none bg-inherit"
+                    style="border-none bg-transparent dark:invert"
                   />
                   <Button
                     icon={"svg/edit-icon.svg"}
                     onClick={() => editCalendar(el.name)}
                     isPrimary={false}
-                    style="border-none bg-inherit"
+                    style="border-none bg-transparent dark:invert"
                   />
                 </div>
               );

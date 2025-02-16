@@ -12,7 +12,7 @@ const DatePicker = ({ value, style, onChange }: DatePickerProps) => {
         type="date"
         id="date-picker"
         value={value}
-        className={`p-2 rounded-lg border border-gray-200 ${style}`}
+        className={`p-2 rounded-lg light:border border-gray-200 bg-white dark:bg-[#2c2e41] ${style}`}
       />
     </label>
   );

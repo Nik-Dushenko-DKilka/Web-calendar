@@ -37,7 +37,11 @@ const useAccumulate = () => {
     dailyEvents: ListOfDailyEvents,
     event: Event
   ) => {
-    while (currentDate <= lastDateOfWeek) {
+    while (
+      (event.repeat === RepeatEvents.DAILY &&
+        currentDate <= addDays(fromUnixTime(event.timestamp), 30)) ||
+      currentDate <= lastDateOfWeek
+    ) {
       const eventDateKey = format(currentDate, "P");
 
       if (!dailyEvents[eventDateKey]) {

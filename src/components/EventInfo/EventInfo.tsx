@@ -31,7 +31,7 @@ const EventInfo = ({
     setVisibilityEdit(!eventIsVisible);
   };
 
-  const deleteEvent = () => {
+  const deleteEventData = () => {
     setEvents((prev) => prev.filter((el: Event) => el.id !== currentEvent?.id));
     setVisibility(!isVisible);
   };
@@ -45,7 +45,7 @@ const EventInfo = ({
     isVisible &&
     currentEvent && (
       <>
-        <section className="absolute top-1/3 left-1/3 w-1/3 bg-white rounded-lg p-4 shadow-md z-50">
+        <section className="absolute top-1/3 left-1/3 w-1/3 bg-white dark:bg-darkSub rounded-lg p-4 shadow-md z-50">
           <div className="flex justify-between">
             <h1 className="text-2xl font-bold">Event information</h1>
             <div className="flex">
@@ -54,7 +54,7 @@ const EventInfo = ({
                 alt="edit an event"
                 height={0}
                 width={0}
-                className="cursor-pointer w-4 h-4"
+                className="cursor-pointer w-4 h-4 dark:invert"
                 onClick={editEvent}
               />
               <Image
@@ -62,15 +62,15 @@ const EventInfo = ({
                 alt="delete an event"
                 height={0}
                 width={0}
-                onClick={deleteEvent}
-                className="mx-2 cursor-pointer w-4 h-4"
+                onClick={deleteEventData}
+                className="mx-2 cursor-pointer w-4 h-4 dark:invert"
               />
               <Image
                 src={"/svg/cross-icon.svg"}
                 alt="close an event"
                 height={0}
                 width={0}
-                className="cursor-pointer w-4 h-4"
+                className="cursor-pointer w-4 h-4 dark:invert"
                 onClick={closeModal}
               />
             </div>
@@ -82,7 +82,7 @@ const EventInfo = ({
               alt="delete an event"
               height={0}
               width={0}
-              className="mr-2 w-4 h-4"
+              className="mr-2 w-4 h-4 self-center"
             />
             <h2 className="text-2xl">{currentEvent.title}</h2>
           </div>
@@ -92,7 +92,7 @@ const EventInfo = ({
               alt="delete an event"
               height={0}
               width={0}
-              className="mr-2 w-4 h-4"
+              className="mr-2 w-4 h-4 self-center"
             />
             <div>
               {formatTime(currentEvent)}
@@ -110,7 +110,7 @@ const EventInfo = ({
               alt="delete an event"
               height={0}
               width={0}
-              className="mr-2 w-4 h-4"
+              className="mr-2 w-4 h-4 self-center"
             />
             <span>{currentEvent.calendar.name}</span>
           </div>
@@ -120,7 +120,7 @@ const EventInfo = ({
               alt="delete an event"
               height={0}
               width={0}
-              className="mr-2 w-4 h-4"
+              className="mr-2 w-4 h-4 self-center"
             />
             {currentEvent.description}
           </div>

@@ -36,7 +36,7 @@ const Input = ({
           placeholder={placeholder}
           disabled={isDisabled}
           onChange={onChange}
-          className={`w-full outline-none disabled:bg-transparent disabled:cursor-not-allowed border-b ${
+          className={`w-full outline-none bg-transparent disabled:bg-transparent disabled:cursor-not-allowed border-b ${
             isError ? "border-[#FF5620]" : "border-[#737373]"
           }`}
         />

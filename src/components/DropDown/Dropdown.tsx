@@ -12,7 +12,7 @@ const Dropdown = ({ labelFor, options, style, onChange }: DropdownProps) => {
         name={labelFor}
         id={labelFor}
         onChange={onChange}
-        className="p-2 pr-6 border rounded-lg hover:bg-[#EFEFEF] active:bg-[#E0E0E0] cursor-pointer appearance-none outline-none"
+        className="p-2 pr-6 border rounded-lg dark:bg-darkSub cursor-pointer appearance-none outline-none"
       >
         {Object.values(options).map((el: any) => {
           return (

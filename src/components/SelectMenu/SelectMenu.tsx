@@ -56,7 +56,7 @@ const SelectMenu = ({
           id={title}
           value={selectedValue}
           defaultValue={defaultValue?.toString()}
-          className={`pr-4 outline-none appearance-none cursor-pointer w-full ${
+          className={`pr-4 outline-none appearance-none cursor-pointer w-full dark:bg-darkSub ${
             isDisabled ? "cursor-not-allowed" : "cursor-pointer"
           }`}
           onChange={handleChange}

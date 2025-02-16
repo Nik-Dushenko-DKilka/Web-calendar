@@ -88,7 +88,7 @@ const ListOfCalendar = ({
     <div
       className={`${
         isVisible ? "block" : "hidden"
-      } absolute w-fit left-[40%] top-1/3 z-50 bg-white p-4 rounded-lg shadow-lg`}
+      } absolute w-fit left-[40%] top-1/3 z-50 dark:bg-darkSub bg-white light:bg-white p-4 rounded-lg shadow-lg`}
     >
       <div className="flex justify-between self-center">
         <h2 className="font-bold text-2xl mb-2">{title}</h2>
@@ -96,7 +96,7 @@ const ListOfCalendar = ({
           onClick={() => setVisibility(false)}
           isPrimary={false}
           icon={"/svg/cross-icon.svg"}
-          style="border-none"
+          style="border-none dark:bg-transparent dark:invert"
         />
       </div>
       <hr />
@@ -106,7 +106,7 @@ const ListOfCalendar = ({
           alt="text icon for create calendar modal"
           width={16}
           height={16}
-          className="mt-[5%] mr-2 w-4 h-4"
+          className="mr-2 w-4 h-4 self-center mt-6"
         />
         <Input
           title="Title"
@@ -122,7 +122,7 @@ const ListOfCalendar = ({
           alt="palette icon"
           width={16}
           height={16}
-          className="mt-[5%] mr-2 w-4 h-4"
+          className="self-center mt-6 mr-2 w-4 h-4"
         />
         <ColorPicker
           colors={colorPalette}

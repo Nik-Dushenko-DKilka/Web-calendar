@@ -70,8 +70,6 @@ const BoardOfWeek = ({
   const [listOfDailyEvents, setListOfDailyEvents] =
     useState<ListOfDailyEvents>();
 
-  console.log(listOfDailyEvents);
-
   const {
     calculateEventsForWeek,
     calculateCollisions,
@@ -91,6 +89,7 @@ const BoardOfWeek = ({
       })
     );
     setDaysInWeek([]);
+    console.log(listOfDailyEvents);
   }, [currentDate]);
 
   useEffect(() => {
@@ -130,7 +129,7 @@ const BoardOfWeek = ({
 
   const isEventOnDay = (event: Event, id: number): boolean => {
     const eventStartDate = new Date(event.timestamp * 1000);
-    const halfYear = addDays(eventStartDate, 14);
+    const halfYear = addDays(eventStartDate, 30);
 
     if (!event.repeat || event.repeat === RepeatEvents.DOES_NOT_REPEAT) {
       return isSameHour(eventStartDate, fromUnixTime(id));
@@ -183,7 +182,7 @@ const BoardOfWeek = ({
       }
       <section className="w-full rounded-lg bg-white">
         <div>
-          <ul className="grid grid-cols-8 text-center border-b-2 shadow-md">
+          <ul className="grid grid-cols-8 text-center border-b-2 shadow-md bg-lightMain dark:bg-darkMain">
             <div className="border-r-2"></div>
             {weekdays.map((el: string, index: number) => {
               return (
@@ -191,7 +190,7 @@ const BoardOfWeek = ({
                   <li
                     className={`py-2 flex m-2 flex-col ${
                       currentDay === daysInWeek[index]
-                        ? "bg-currentDay rounded-lg"
+                        ? "bg-currentDay dark:bg-darkSub rounded-lg"
                         : "bg-transparent"
                     }`}
                   >
@@ -203,11 +202,14 @@ const BoardOfWeek = ({
             })}
           </ul>
         </div>
-        <section className="overflow-y-scroll no-scrollbar h-[79vh] ">
+        <section className="overflow-y-scroll no-scrollbar h-[79vh]">
           {listOfHours.map((time: string) => {
             return (
-              <div className="flex flex-row" key={crypto.randomUUID()}>
-                <span className="text-center h-28 w-[14%] flex items-end justify-center -mb-2">
+              <div
+                className="flex flex-row bg-white dark:bg-darkSub"
+                key={crypto.randomUUID()}
+              >
+                <span className="text-center h-28 w-[14%] flex items-end justify-center bg-lightMain dark:bg-darkMain">
                   {time}
                 </span>
                 <div className="flex flex-row w-full">

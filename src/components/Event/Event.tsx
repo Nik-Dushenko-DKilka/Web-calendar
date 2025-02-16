@@ -3,7 +3,6 @@ import {
   addHours,
   format,
   fromUnixTime,
-  getTime,
   getUnixTime,
   parse,
   startOfDay,
@@ -23,6 +22,7 @@ import { Calendar } from "@/types/Calendar";
 import { listOfMinutes } from "@/utils/listOfTime";
 import { ErrorMessage } from "@/types/ErrorMessage";
 import { EditableEventContext } from "../CalendarBoard/CalendarBoard";
+import { useDispatch, useSelector } from "react-redux";
 
 interface CreateEventProps {
   calendars: Calendar[];
@@ -57,6 +57,18 @@ const CreateEvent = ({
     addHours(startOfDay(fromUnixTime(timestamp)), 5)
   );
   const [time, setTime] = useState<number[]>([startOfTime, startOfTime]);
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch("http://localhost:8080/api/event?id=1");
+      const data = await response.json();
+
+      setData(data);
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     !task.length
@@ -137,7 +149,7 @@ const CreateEvent = ({
     }
   };
 
-  const saveEvent = () => {
+  const saveEventData = () => {
     if (errorMessages.title || errorMessages.time) {
       return;
     }
@@ -187,7 +199,7 @@ const CreateEvent = ({
 
   return (
     <section
-      className={`bg-white w-1/3 p-6 rounded-lg absolute top-[25%] z-50 left-[35.5%] border-2 ${
+      className={`bg-white dark:bg-darkSub w-1/3 p-6 rounded-lg absolute top-[25%] z-50 left-[35.5%] border-2 ${
         isVisible ? "block" : "hidden"
       }`}
     >
@@ -200,7 +212,7 @@ const CreateEvent = ({
             onClick={closeModal}
             isPrimary={false}
             icon={"/svg/cross-icon.svg"}
-            style="border-none"
+            style="border-none dark:bg-transparent dark:invert"
           />
         }
       </div>
@@ -326,7 +338,7 @@ const CreateEvent = ({
       </div>
       {
         <Button
-          onClick={saveEvent}
+          onClick={saveEventData}
           isDisabled={errorMessages.title || errorMessages.time ? true : false}
           text="Save"
           style="float-right mt-4 w-1/4"
