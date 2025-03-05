@@ -57,18 +57,6 @@ const CreateEvent = ({
     addHours(startOfDay(fromUnixTime(timestamp)), 5)
   );
   const [time, setTime] = useState<number[]>([startOfTime, startOfTime]);
-  const [data, setData] = useState<any>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch("http://localhost:8080/api/event?id=1");
-      const data = await response.json();
-
-      setData(data);
-    };
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     !task.length

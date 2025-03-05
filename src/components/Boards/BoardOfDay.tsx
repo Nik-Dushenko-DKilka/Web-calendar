@@ -131,10 +131,10 @@ const BoardOfDay = ({
           setVisibility={setVisibilityInfoModal}
         />
       }
-      <section className="w-full h-fit rounded-lg bg-white">
+      <section className="w-full h-fit rounded-lg bg-white dark:bg-darkSub">
         <div className="flex border-b-2 shadow-md">
           <div className="w-[12%] border-r-2"></div>
-          <div className="flex flex-col m-2 py-1 rounded-lg px-12 text-center bg-currentDay">
+          <div className="flex flex-col m-2 py-1 rounded-lg px-12 text-center bg-currentDay dark:bg-darkBackgraund">
             <span className="font-bold">{format(currentDate, "d")}</span>
             <span className="font-bold">{format(currentDate, "EEEE")}</span>
           </div>

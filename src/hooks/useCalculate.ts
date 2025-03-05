@@ -16,29 +16,26 @@ const useCalculate = () => {
   const { accumulateCollisions, accumulateEvents } = useAccumulate();
 
   const calculateEventsForWeek = (events: Event[], currentDate: Date) => {
-    const firstDateOfWeek = startOfWeek(new Date(currentDate));
-    const lastDateOfWeek = endOfWeek(new Date(currentDate));
-    const eventsThisWeek = events.filter((event: Event) => {
-      const eventDate = fromUnixTime(event.timestamp);
-      return eventDate >= firstDateOfWeek && eventDate <= lastDateOfWeek;
-    });
-
-    const eventsByWeek = new Map<number, ListOfDailyEvents>();
-
-    eventsThisWeek.forEach((event: Event) => {
-      const eventStartDate = fromUnixTime(event.timestamp);
-      const weekNumber = getISOWeek(eventStartDate);
-      if (!eventsByWeek.has(weekNumber)) {
-        eventsByWeek.set(weekNumber, {});
-      }
-      const dailyEvents = eventsByWeek.get(weekNumber) ?? {};
-      let currentDate = eventStartDate;
-
-      accumulateEvents(currentDate, lastDateOfWeek, dailyEvents, event);
-      eventsByWeek.set(weekNumber, dailyEvents);
-    });
-    const currentWeekNumber = getISOWeek(new Date(currentDate));
-    return { currentWeekNumber, eventsByWeek };
+    // const firstDateOfWeek = startOfWeek(new Date(currentDate));
+    // const lastDateOfWeek = endOfWeek(new Date(currentDate));
+    // const eventsThisWeek = events.filter((event: Event) => {
+    //   const eventDate = fromUnixTime(event.timestamp);
+    //   return eventDate >= firstDateOfWeek && eventDate <= lastDateOfWeek;
+    // });
+    // const eventsByWeek = new Map<number, ListOfDailyEvents>();
+    // eventsThisWeek.forEach((event: Event) => {
+    //   const eventStartDate = fromUnixTime(event.timestamp);
+    //   const weekNumber = getISOWeek(eventStartDate);
+    //   if (!eventsByWeek.has(weekNumber)) {
+    //     eventsByWeek.set(weekNumber, {});
+    //   }
+    //   const dailyEvents = eventsByWeek.get(weekNumber) ?? {};
+    //   let currentDate = eventStartDate;
+    //   accumulateEvents(currentDate, lastDateOfWeek, dailyEvents, event);
+    //   eventsByWeek.set(weekNumber, dailyEvents);
+    // });
+    // const currentWeekNumber = getISOWeek(new Date(currentDate));
+    // return { currentWeekNumber, eventsByWeek };
   };
 
   const calculateCollisions = (
@@ -96,10 +93,11 @@ const useCalculate = () => {
   const calculateMinutes = (timestamp: number) => {
     const minutes: number = fromUnixTime(timestamp).getMinutes();
     const percentageMap: Record<number, string> = {
-      15: "top-[25%]",
-      30: "top-[50%]",
-      45: "top-[75%]",
+      15: "25%",
+      30: "50%",
+      45: "75%",
     };
+
     return percentageMap[minutes] || "0%";
   };
 
@@ -115,6 +113,7 @@ const useCalculate = () => {
       endOfDay(fromUnixTime(endTimestamp)),
       startTime
     );
+
     //15 is a each 15 minutes in an hour and 25 is a percentage for height(each 15 minutes is a 25%)
     const intervals: number = allDay
       ? Math.ceil(totalMinutesFromEndDay / 15)

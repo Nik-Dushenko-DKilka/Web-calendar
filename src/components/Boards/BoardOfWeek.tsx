@@ -24,6 +24,8 @@ import { listOfHours } from "@/utils/listOfTime";
 import { RepeatEvents } from "@/enums/RepeatEvents";
 import { ListOfDailyEvents } from "@/types/ListOfDailyEvents";
 import useCalculate from "@/hooks/useCalculate";
+import EventItem from "../EventItem/EventItem";
+import HeaderOfBoard from "../HeaderOfBoard/HeaderOfBoard";
 
 interface BoardOfWeekProps {
   currentDate: Date;
@@ -57,7 +59,6 @@ const BoardOfWeek = ({
     })
   );
   const weekdays: string[] = daysOfWeek.map((day) => format(day, "EEE"));
-  const currentDay: number = getDate(new Date());
   const [daysInWeek, setDaysInWeek] = useState<number[]>([]);
   const [startWeek, setStartWeek] = useState<number>(
     startOfWeek(new Date(currentDate)).getDate()
@@ -67,17 +68,9 @@ const BoardOfWeek = ({
   );
   const [visibilityInfoModal, setVisibilityInfoModal] =
     useState<boolean>(false);
-  const [listOfDailyEvents, setListOfDailyEvents] =
-    useState<ListOfDailyEvents>();
-
-  const {
-    calculateEventsForWeek,
-    calculateCollisions,
-    calculateHeightPercentage,
-    calculateLeft,
-    calculateMinutes,
-    calculateWidth,
-  } = useCalculate();
+  const [listOfDailyEvents, setListOfDailyEvents] = useState<ListOfDailyEvents>(
+    {}
+  );
 
   useEffect(() => {
     setStartWeek(startOfWeek(new Date(currentDate)).getDate());
@@ -89,7 +82,6 @@ const BoardOfWeek = ({
       })
     );
     setDaysInWeek([]);
-    console.log(listOfDailyEvents);
   }, [currentDate]);
 
   useEffect(() => {
@@ -104,12 +96,12 @@ const BoardOfWeek = ({
   }, [startWeek]);
 
   useEffect(() => {
-    const { currentWeekNumber, eventsByWeek } = calculateEventsForWeek(
-      events,
-      currentDate
-    );
-    const updatedEvents = calculateCollisions(eventsByWeek, currentWeekNumber);
-    setListOfDailyEvents(updatedEvents);
+    // const { currentWeekNumber, eventsByWeek } = calculateEventsForWeek(
+    //   events,
+    //   currentDate
+    // );
+    // const updatedEvents = calculateCollisions(eventsByWeek, currentWeekNumber);
+    // setListOfDailyEvents(updatedEvents);
   }, [events, currentDate]);
 
   const calculateId = (el: string, index: number) => {
@@ -181,27 +173,7 @@ const BoardOfWeek = ({
         />
       }
       <section className="w-full rounded-lg bg-white">
-        <div>
-          <ul className="grid grid-cols-8 text-center border-b-2 shadow-md bg-lightMain dark:bg-darkMain">
-            <div className="border-r-2"></div>
-            {weekdays.map((el: string, index: number) => {
-              return (
-                <div className="border-r-2" key={crypto.randomUUID()}>
-                  <li
-                    className={`py-2 flex m-2 flex-col ${
-                      currentDay === daysInWeek[index]
-                        ? "bg-currentDay dark:bg-darkSub rounded-lg"
-                        : "bg-transparent"
-                    }`}
-                  >
-                    <span className="font-bold">{daysInWeek[index]}</span>
-                    {el}
-                  </li>
-                </div>
-              );
-            })}
-          </ul>
-        </div>
+        <HeaderOfBoard daysInWeek={daysInWeek} weekdays={weekdays} />
         <section className="overflow-y-scroll no-scrollbar h-[79vh]">
           {listOfHours.map((time: string) => {
             return (
@@ -228,34 +200,16 @@ const BoardOfWeek = ({
                                 (calendar) => calendar.name === el.calendar.name
                               ) || calendars[0];
                             const day = format(fromUnixTime(id), "P");
+
                             return (
-                              <div
+                              <EventItem
                                 key={crypto.randomUUID()}
-                                className={`bg-opacity-50 absolute z-40 rounded-lg p-2 cursor-pointer overflow-hidden ${calculateMinutes(
-                                  el.timestamp
-                                )} h-full`}
-                                id={el.id}
-                                style={{
-                                  width: listOfDailyEvents
-                                    ? calculateWidth(el, listOfDailyEvents, day)
-                                    : "100%",
-                                  left: listOfDailyEvents
-                                    ? calculateLeft(el, listOfDailyEvents)
-                                    : "0%",
-                                  height: calculateHeightPercentage(
-                                    el.time[0],
-                                    el.time[1],
-                                    el.allDay
-                                  ),
-                                  backgroundColor: currentCalendar?.color,
-                                }}
-                                onClick={() => updateCurrentEvent(el)}
-                              >
-                                <h2>{el.title}</h2>
-                                <span className="text-sm">
-                                  {el.description}
-                                </span>
-                              </div>
+                                el={el}
+                                day={day}
+                                listOfDailyEvents={listOfDailyEvents}
+                                updateCurrentEvent={updateCurrentEvent}
+                                currentCalendar={currentCalendar}
+                              />
                             );
                           }
                         })}

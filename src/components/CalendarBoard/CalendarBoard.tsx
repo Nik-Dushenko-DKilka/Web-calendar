@@ -202,13 +202,13 @@ const CalendarBoard = ({
                     icon={"svg/delete-icon.svg"}
                     onClick={() => deleteCalendar(el.id)}
                     isPrimary={false}
-                    style="border-none bg-transparent dark:invert"
+                    style="border-none dark:bg-transparent dark:invert"
                   />
                   <Button
                     icon={"svg/edit-icon.svg"}
                     onClick={() => editCalendar(el.name)}
                     isPrimary={false}
-                    style="border-none bg-transparent dark:invert"
+                    style="border-none dark:bg-transparent dark:invert"
                   />
                 </div>
               );

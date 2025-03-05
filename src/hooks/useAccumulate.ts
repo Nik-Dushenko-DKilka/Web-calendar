@@ -12,23 +12,22 @@ import {
 
 const useAccumulate = () => {
   const newEvent = (event: Event, currentDate: Date) => {
-    const daysDifference = differenceInDays(
-      currentDate,
-      new Date(event.timestamp * 1000)
-    );
-    const updatedTimestamp =
-      addDays(new Date(event.timestamp * 1000), daysDifference).getTime() /
-      1000;
-
-    return {
-      id: event.id,
-      timestamp: updatedTimestamp,
-      startTime: event.time[0] + daysDifference * 86400,
-      endTime: event.time[1] + daysDifference * 86400,
-      collisions: 0,
-      repeat: event.repeat,
-      repeatID: `${event.id}_${updatedTimestamp}`,
-    };
+    // const daysDifference = differenceInDays(
+    //   currentDate,
+    //   new Date(event.timestamp * 1000)
+    // );
+    // const updatedTimestamp =
+    //   addDays(new Date(event.timestamp * 1000), daysDifference).getTime() /
+    //   1000;
+    // return {
+    //   id: event.id,
+    //   timestamp: updatedTimestamp,
+    //   startTime: event.time[0] + daysDifference * 86400,
+    //   endTime: event.time[1] + daysDifference * 86400,
+    //   collisions: 0,
+    //   repeat: event.repeat,
+    //   repeatID: `${event.id}_${updatedTimestamp}`,
+    // };
   };
 
   const accumulateEvents = (
@@ -37,27 +36,24 @@ const useAccumulate = () => {
     dailyEvents: ListOfDailyEvents,
     event: Event
   ) => {
-    while (
-      (event.repeat === RepeatEvents.DAILY &&
-        currentDate <= addDays(fromUnixTime(event.timestamp), 30)) ||
-      currentDate <= lastDateOfWeek
-    ) {
-      const eventDateKey = format(currentDate, "P");
-
-      if (!dailyEvents[eventDateKey]) {
-        dailyEvents[eventDateKey] = [];
-      }
-
-      dailyEvents[eventDateKey].push(newEvent(event, currentDate));
-
-      if (event.repeat === RepeatEvents.DAILY) {
-        currentDate = addDays(currentDate, 1);
-      } else if (event.repeat === RepeatEvents.MONTHLY) {
-        currentDate = addMonths(currentDate, 1);
-      } else {
-        break;
-      }
-    }
+    // while (
+    //   (event.repeat === RepeatEvents.DAILY &&
+    //     currentDate <= addDays(fromUnixTime(event.timestamp), 30)) ||
+    //   currentDate <= lastDateOfWeek
+    // ) {
+    //   const eventDateKey = format(currentDate, "P");
+    //   if (!dailyEvents[eventDateKey]) {
+    //     dailyEvents[eventDateKey] = [];
+    //   }
+    //   dailyEvents[eventDateKey].push(newEvent(event, currentDate));
+    //   if (event.repeat === RepeatEvents.DAILY) {
+    //     currentDate = addDays(currentDate, 1);
+    //   } else if (event.repeat === RepeatEvents.MONTHLY) {
+    //     currentDate = addMonths(currentDate, 1);
+    //   } else {
+    //     break;
+    //   }
+    // }
   };
 
   const accumulateCollisions = (dailyEvents: DailyEvent[]) => {

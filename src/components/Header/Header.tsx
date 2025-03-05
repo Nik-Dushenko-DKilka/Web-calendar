@@ -25,6 +25,7 @@ const Header = ({
   setCurrentDate,
 }: HeaderProps) => {
   const view: object = { week: "Week", day: "Day" };
+  const today = new Date();
 
   const increaseMonth = () => {
     setCurrentDate(addWeeks(currentDate, 1));
@@ -56,7 +57,7 @@ const Header = ({
       </h2>
       <Button
         text="Today"
-        onClick={() => setCurrentDate(new Date())}
+        onClick={() => setCurrentDate(today)}
         style="h-fit ml-6 self-center"
       />
       <Button
