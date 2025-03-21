@@ -45,7 +45,7 @@ const EventInfo = ({
     isVisible &&
     currentEvent && (
       <>
-        <section className="absolute top-1/3 left-1/3 w-1/3 bg-white dark:bg-darkSub rounded-lg p-4 shadow-md z-50">
+        <section className="absolute top-1/3 left-1/3 w-1/3 dark:border dark:border-gray-400 bg-white dark:bg-darkSub rounded-lg p-4 shadow-md z-50">
           <div className="flex justify-between">
             <h1 className="text-2xl font-bold">Event information</h1>
             <div className="flex">

@@ -1,21 +1,18 @@
 import useCalculate from "@/hooks/useCalculate";
 import { Calendar } from "@/types/Calendar";
 import Event from "@/types/Event";
-import { ListOfDailyEvents } from "@/types/ListOfDailyEvents";
 
 interface EventItemProps {
   el: Event;
-  day: string;
+  events: Event[];
   currentCalendar: Calendar;
-  listOfDailyEvents: ListOfDailyEvents;
   updateCurrentEvent: (el: Event) => void;
 }
 
 const EventItem = ({
   el,
-  day,
+  events,
   currentCalendar,
-  listOfDailyEvents,
   updateCurrentEvent,
 }: EventItemProps) => {
   const {
@@ -27,14 +24,12 @@ const EventItem = ({
 
   return (
     <div
-      className={`absolute z-40 rounded-lg p-2 cursor-pointer overflow-hidden`}
+      className={`absolute z-40 rounded-lg p-2 cursor-pointer overflow-hidden border border-gray-400 `}
       id={el.id}
       style={{
         top: calculateMinutes(el.timestamp),
-        width: listOfDailyEvents
-          ? calculateWidth(el, listOfDailyEvents, day)
-          : "100%",
-        left: listOfDailyEvents ? calculateLeft(el, listOfDailyEvents) : "0%",
+        width: calculateWidth(el, events),
+        left: calculateLeft(el, events),
         height: calculateHeightPercentage(el.time[0], el.time[1], el.allDay),
         backgroundColor: currentCalendar?.color,
       }}

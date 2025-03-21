@@ -1,80 +1,63 @@
 import { RepeatEvents } from "@/enums/RepeatEvents";
 import Event from "@/types/Event";
-import { DailyEvent, ListOfDailyEvents } from "@/types/ListOfDailyEvents";
 import {
   areIntervalsOverlapping,
   differenceInMinutes,
   endOfDay,
-  endOfWeek,
   fromUnixTime,
-  getISOWeek,
-  startOfWeek,
 } from "date-fns";
-import useAccumulate from "./useAccumulate";
 
 const useCalculate = () => {
-  const { accumulateCollisions, accumulateEvents } = useAccumulate();
+  const calculateCollisions = (events: Event[]) => {
+    const eventsCopy = events.map((event) => ({
+      ...event,
+      collisions: 0,
+      index: 0,
+    }));
 
-  const calculateEventsForWeek = (events: Event[], currentDate: Date) => {
-    // const firstDateOfWeek = startOfWeek(new Date(currentDate));
-    // const lastDateOfWeek = endOfWeek(new Date(currentDate));
-    // const eventsThisWeek = events.filter((event: Event) => {
-    //   const eventDate = fromUnixTime(event.timestamp);
-    //   return eventDate >= firstDateOfWeek && eventDate <= lastDateOfWeek;
-    // });
-    // const eventsByWeek = new Map<number, ListOfDailyEvents>();
-    // eventsThisWeek.forEach((event: Event) => {
-    //   const eventStartDate = fromUnixTime(event.timestamp);
-    //   const weekNumber = getISOWeek(eventStartDate);
-    //   if (!eventsByWeek.has(weekNumber)) {
-    //     eventsByWeek.set(weekNumber, {});
-    //   }
-    //   const dailyEvents = eventsByWeek.get(weekNumber) ?? {};
-    //   let currentDate = eventStartDate;
-    //   accumulateEvents(currentDate, lastDateOfWeek, dailyEvents, event);
-    //   eventsByWeek.set(weekNumber, dailyEvents);
-    // });
-    // const currentWeekNumber = getISOWeek(new Date(currentDate));
-    // return { currentWeekNumber, eventsByWeek };
-  };
-
-  const calculateCollisions = (
-    eventsByWeek: Map<number, ListOfDailyEvents>,
-    currentWeekNumber: number
-  ) => {
-    const eventsForCurrentWeek = eventsByWeek.get(currentWeekNumber);
-    const updatedEvents: ListOfDailyEvents = {};
-    for (const date in eventsForCurrentWeek) {
-      if (eventsForCurrentWeek.hasOwnProperty(date)) {
-        const dailyEvents = eventsForCurrentWeek[date];
-
-        accumulateCollisions(dailyEvents);
-        calculateProperties(dailyEvents);
-
-        updatedEvents[date] = dailyEvents;
+    for (let i = 0; i < eventsCopy.length; i++) {
+      for (let j = i + 1; j < eventsCopy.length; j++) {
+        if (
+          areIntervalsOverlapping(
+            {
+              start: fromUnixTime(eventsCopy[i].time[0]),
+              end: fromUnixTime(eventsCopy[i].time[1]),
+            },
+            {
+              start: fromUnixTime(eventsCopy[j].time[0]),
+              end: fromUnixTime(eventsCopy[j].time[1]),
+            },
+            { inclusive: true }
+          )
+        ) {
+          eventsCopy[i].collisions++;
+          eventsCopy[j].collisions++;
+        }
       }
     }
+    calculateProperties(eventsCopy);
 
-    return updatedEvents;
+    return eventsCopy;
   };
 
-  const calculateProperties = (dailyEvents: DailyEvent[]) => {
-    dailyEvents.forEach((event) => {
-      const overlappingEvents = dailyEvents.filter((otherEvent) => {
-        const firstEventStart = fromUnixTime(event.startTime);
-        const firstEventEnd = fromUnixTime(event.endTime);
-        const secondEventStart = fromUnixTime(otherEvent.startTime);
-        const secondEventEnd = fromUnixTime(otherEvent.endTime);
+  const calculateProperties = (events: Event[]) => {
+    events.forEach((event) => {
+      const overlappingEvents = events.filter((otherEvent) => {
+        const firstEventStart = fromUnixTime(event.time[0]);
+        const firstEventEnd = fromUnixTime(event.time[1]);
+        const secondEventStart = fromUnixTime(otherEvent.time[0]);
+        const secondEventEnd = fromUnixTime(otherEvent.time[1]);
 
         return areIntervalsOverlapping(
           { start: firstEventStart, end: firstEventEnd },
-          { start: secondEventStart, end: secondEventEnd }
+          { start: secondEventStart, end: secondEventEnd },
+          { inclusive: true }
         );
       });
 
       overlappingEvents.sort((a, b) => {
-        const durationA = a.endTime - a.startTime;
-        const durationB = b.endTime - b.startTime;
+        const durationA = a.time[1] - a.time[0];
+        const durationB = b.time[1] - b.time[0];
         if (durationA !== durationB) {
           return durationB - durationA;
         }
@@ -84,9 +67,8 @@ const useCalculate = () => {
       const positionIndex = overlappingEvents.findIndex(
         (overlap) => overlap.id === event.id
       );
-      const widthPercentage = 100 / overlappingEvents.length;
-      event.leftOffset = widthPercentage * positionIndex;
-      event.width = widthPercentage;
+
+      event.index = positionIndex;
     });
   };
 
@@ -130,49 +112,45 @@ const useCalculate = () => {
     }%`;
   };
 
-  const calculateWidth = (
-    event: Event,
-    listOfDailyEvents: ListOfDailyEvents,
-    day?: string
-  ) => {
-    for (const date in listOfDailyEvents) {
-      if (day === date) {
-        for (const el of listOfDailyEvents[date]) {
-          if (
-            (el.repeat === RepeatEvents.DAILY &&
-              el.repeatID === event.repeatID) ||
-            el.timestamp === event.timestamp
-          ) {
-            return `${el.width}%`;
-          }
-        }
-      }
-    }
+  const calculateWidth = (event: Event, events: Event[]) => {
+    const copyEvents = events.map((event: Event) => ({
+      ...event,
+      width: 100,
+    }));
 
-    return `100%`;
+    copyEvents.forEach((el) => {
+      if (
+        (el.repeat === RepeatEvents.DAILY && el.repeatID === event.repeatID) ||
+        el.id === event.id
+      ) {
+        event.width = el.width / (el.collisions + 1);
+        return `${event.width}%`;
+      }
+    });
+
+    return `${event.width}%`;
   };
 
-  const calculateLeft = (
-    event: Event,
-    listOfDailyEvents: ListOfDailyEvents
-  ) => {
-    for (const date in listOfDailyEvents) {
-      if (listOfDailyEvents.hasOwnProperty(date)) {
-        const dailyEvents = listOfDailyEvents[date];
-        for (const el of dailyEvents) {
-          if (
-            el.repeatID === event.repeatID ||
-            (el.id === event.id && el.repeat !== RepeatEvents.DAILY)
-          ) {
-            return `${el.leftOffset}%`;
-          }
-        }
+  const calculateLeft = (event: Event, events: Event[]) => {
+    const copyEvents = events.map((event: Event) => ({
+      ...event,
+      leftOffset: 0,
+    }));
+
+    copyEvents.forEach((el) => {
+      if (
+        (el.repeat === RepeatEvents.DAILY && el.repeatID === event.repeatID) ||
+        el.id === event.id
+      ) {
+        event.leftOffset = (100 / (el.collisions + 1)) * el.index;
+        return `${event.leftOffset}%`;
       }
-    }
+    });
+
+    return `${event.leftOffset}%`;
   };
 
   return {
-    calculateEventsForWeek,
     calculateCollisions,
     calculateLeft,
     calculateMinutes,

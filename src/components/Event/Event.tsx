@@ -22,7 +22,6 @@ import { Calendar } from "@/types/Calendar";
 import { listOfMinutes } from "@/utils/listOfTime";
 import { ErrorMessage } from "@/types/ErrorMessage";
 import { EditableEventContext } from "../CalendarBoard/CalendarBoard";
-import { useDispatch, useSelector } from "react-redux";
 
 interface CreateEventProps {
   calendars: Calendar[];
@@ -142,7 +141,7 @@ const CreateEvent = ({
       return;
     }
 
-    const newEvent = {
+    const newEvent: Event = {
       id: crypto.randomUUID(),
       title: task,
       timestamp: timestamp,
@@ -151,6 +150,10 @@ const CreateEvent = ({
       repeat: repeat,
       calendar: calendar,
       description: description,
+      collisions: 0,
+      width: 100,
+      leftOffset: 0,
+      index: 0,
     };
 
     if (editable) {
@@ -277,14 +280,14 @@ const CreateEvent = ({
           text="All day"
           style="ml-[7%]"
         />
-        <SelectMenu
+        {/* <SelectMenu
           defaultValue={editableEvent?.repeat}
           options={Object.values(RepeatEvents)}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
             setRepeat(e.target.value)
           }
           style="ml-6"
-        />
+        /> */}
       </div>
       <h3 className="mt-4 ml-8">Calendar</h3>
       <div className="flex flex-row">

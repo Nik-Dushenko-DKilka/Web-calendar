@@ -6,6 +6,9 @@ import Button from "@/components/Button/Button";
 import Dropdown from "../DropDown/Dropdown";
 import { addDays, addWeeks, format, subDays, subWeeks } from "date-fns";
 import ToggleTheme from "../ToggleTheme/ToggleTheme";
+import { signIn, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { redirect } from "next/navigation";
 
 const mysteryFont = Mystery_Quest({
   subsets: ["latin"],
@@ -26,6 +29,17 @@ const Header = ({
 }: HeaderProps) => {
   const view: object = { week: "Week", day: "Day" };
   const today = new Date();
+  const [user, setUser] = useState<{ username: string; userImg: string }>();
+  const session = useSession();
+
+  useEffect(() => {
+    if (session.status === "authenticated") {
+      setUser({
+        username: session.data?.user?.name!,
+        userImg: session.data?.user?.image!,
+      });
+    }
+  }, [session]);
 
   const increaseMonth = () => {
     setCurrentDate(addWeeks(currentDate, 1));
@@ -58,7 +72,11 @@ const Header = ({
       <Button
         text="Today"
         onClick={() => setCurrentDate(today)}
-        style="h-fit ml-6 self-center"
+        isDisabled={
+          currentDate.getDate() === today.getDate() &&
+          currentDate.getMonth() === today.getMonth()
+        }
+        style={`h-fit ml-6 self-center`}
       />
       <Button
         icon="/svg/left-icon.svg"
@@ -84,19 +102,29 @@ const Header = ({
         labelFor="view"
         options={view}
         onChange={() => setIsDayView(!isDayView)}
-        style="self-center absolute right-56"
+        style="self-center absolute right-60"
       />
       <ToggleTheme />
-      <div className="self-center absolute right-12 flex flex-row">
-        <span className="self-center">{"Username"}</span>
-        <Image
-          src={"svg/cross-icon.svg"}
-          alt="user icon"
-          height={0}
-          width={0}
-          className="w-8 h-8 rounded-full ml-4 border-2"
-        ></Image>
-      </div>
+      {user?.username.length ? (
+        <div
+          className="self-center absolute right-12 flex flex-row cursor-pointer"
+          onClick={() => redirect("/profile")}
+        >
+          <span className="self-center">{user.username}</span>
+          <img
+            src={user.userImg}
+            alt="user icon"
+            className="w-8 h-8 rounded-full ml-4 border-2"
+          ></img>
+        </div>
+      ) : (
+        <button
+          className="self-center absolute right-16"
+          onClick={() => signIn()}
+        >
+          Sign in
+        </button>
+      )}
     </header>
   );
 };

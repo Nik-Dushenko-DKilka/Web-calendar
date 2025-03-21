@@ -15,6 +15,7 @@ import {
   saveToLocalStorageWithoutPrevState,
 } from "@/localStorage/localStorage";
 import EventType from "@/types/Event";
+import { useSession } from "next-auth/react";
 
 interface CalendarBoardProps {
   isDayView: boolean;
@@ -57,6 +58,9 @@ const CalendarBoard = ({
   const [editableCalendar, setEditableCalendar] = useState<Calendar>(
     calendars[0]
   );
+
+  const session = useSession();
+  console.log(session);
 
   const calendarsFromStorage: Calendar[] = getFromLocalStorage("calendars");
 
