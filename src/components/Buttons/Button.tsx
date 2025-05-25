@@ -1,7 +1,7 @@
-interface ButtonProps {
+interface ButtonProps extends React.HTMLProps<HTMLButtonElement> {
   text?: string;
   icon?: string;
-  style?: string;
+  styles?: string;
   isPrimary?: boolean;
   isDisabled?: boolean;
   onClick: () => void;
@@ -12,7 +12,7 @@ const Button = ({
   icon,
   isPrimary = true,
   isDisabled,
-  style,
+  styles,
   onClick,
 }: Partial<ButtonProps>) => {
   return (
@@ -21,7 +21,7 @@ const Button = ({
         isPrimary
           ? "bg-lightMain dark:bg-darkMain text-black dark:text-white disabled:bg-[#b1b1b1] active:bg-lightMain dark:active:bg-darkMain dark:disabled:bg-[#C8C8C8] active:opacity-50"
           : "bg-white text-black disabled:bg-[#C8C8C8] dark:disabled:bg-[#C8C8C8] hover:bg-[#EFEFEF] active:bg-[#C8C8C8] border"
-      } rounded-lg ${style}`}
+      } rounded-lg ${styles}`}
       disabled={isDisabled}
       onClick={onClick}
     >

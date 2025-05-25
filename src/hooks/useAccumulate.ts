@@ -1,14 +1,6 @@
-import { RepeatEvents } from "@/enums/RepeatEvents";
 import Event from "@/types/Event";
-import { DailyEvent, ListOfDailyEvents } from "@/types/ListOfDailyEvents";
-import {
-  addDays,
-  addMonths,
-  areIntervalsOverlapping,
-  differenceInDays,
-  format,
-  fromUnixTime,
-} from "date-fns";
+import { ListOfDailyEvents } from "@/types/ListOfDailyEvents";
+import { addDays, differenceInDays, format } from "date-fns";
 
 const useAccumulate = () => {
   const newEvent = (event: Event, currentDate: Date) => {
@@ -25,7 +17,6 @@ const useAccumulate = () => {
       startTime: event.time[0] + daysDifference * 86400,
       endTime: event.time[1] + daysDifference * 86400,
       collisions: 0,
-      repeat: event.repeat,
       repeatID: `${event.id}_${updatedTimestamp}`,
     };
   };
@@ -36,24 +27,11 @@ const useAccumulate = () => {
     dailyEvents: ListOfDailyEvents,
     event: Event
   ) => {
-    while (
-      (event.repeat === RepeatEvents.DAILY &&
-        currentDate <= addDays(fromUnixTime(event.timestamp), 10)) ||
-      currentDate <= lastDateOfWeek
-    ) {
-      const eventDateKey = format(currentDate, "P");
-      if (!dailyEvents[eventDateKey]) {
-        dailyEvents[eventDateKey] = [];
-      }
-      dailyEvents[eventDateKey].push(newEvent(event, currentDate));
-      if (event.repeat === RepeatEvents.DAILY) {
-        currentDate = addDays(currentDate, 1);
-      } else if (event.repeat === RepeatEvents.MONTHLY) {
-        currentDate = addMonths(currentDate, 1);
-      } else {
-        break;
-      }
+    const eventDateKey = format(currentDate, "P");
+    if (!dailyEvents[eventDateKey]) {
+      dailyEvents[eventDateKey] = [];
     }
+    dailyEvents[eventDateKey].push(newEvent(event, currentDate));
   };
 
   const accumulateCollisions = (events: Event[]) => {

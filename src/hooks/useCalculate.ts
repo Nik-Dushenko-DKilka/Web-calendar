@@ -1,4 +1,3 @@
-import { RepeatEvents } from "@/enums/RepeatEvents";
 import Event from "@/types/Event";
 import {
   areIntervalsOverlapping,
@@ -119,10 +118,7 @@ const useCalculate = () => {
     }));
 
     copyEvents.forEach((el) => {
-      if (
-        (el.repeat === RepeatEvents.DAILY && el.repeatID === event.repeatID) ||
-        el.id === event.id
-      ) {
+      if (el.id === event.id) {
         event.width = el.width / (el.collisions + 1);
         return `${event.width}%`;
       }
@@ -138,10 +134,7 @@ const useCalculate = () => {
     }));
 
     copyEvents.forEach((el) => {
-      if (
-        (el.repeat === RepeatEvents.DAILY && el.repeatID === event.repeatID) ||
-        el.id === event.id
-      ) {
+      if (el.id === event.id) {
         event.leftOffset = (100 / (el.collisions + 1)) * el.index;
         return `${event.leftOffset}%`;
       }

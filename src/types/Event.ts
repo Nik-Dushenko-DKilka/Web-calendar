@@ -6,7 +6,6 @@ type Event = {
   timestamp: number;
   time: number[];
   allDay: boolean;
-  repeat: string;
   calendar: Calendar;
   description: string;
   repeatID?: string | number;

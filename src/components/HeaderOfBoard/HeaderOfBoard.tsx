@@ -34,15 +34,15 @@ const HeaderOfBoard = ({
             <div className="border-r-2" key={crypto.randomUUID()}>
               <li
                 className={`py-2 flex m-2 flex-col ${
-                  getDate(currentDay) === daysInWeek[index + 1] &&
+                  getDate(currentDay) === daysInWeek[index] &&
                   getDate(currentDay) === currentDate.getDate() &&
                   getMonth(currentDay) === currentDate.getMonth()
                     ? "bg-currentDay dark:bg-darkSub rounded-lg"
                     : "bg-transparent"
                 }`}
               >
-                <span className="font-bold">{format(addDays(el, 1), "d")}</span>
-                {format(addDays(el, 1), "EEE")}
+                <span className="font-bold">{format(el, "d")}</span>
+                {format(el, "EEE")}
               </li>
             </div>
           );

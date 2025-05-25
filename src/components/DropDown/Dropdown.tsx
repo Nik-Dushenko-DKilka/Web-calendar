@@ -14,7 +14,7 @@ const Dropdown = ({ labelFor, options, style, onChange }: DropdownProps) => {
         onChange={onChange}
         className="p-2 pr-6 border rounded-lg dark:bg-darkSub cursor-pointer appearance-none outline-none"
       >
-        {Object.values(options).map((el: any) => {
+        {Object.values(options).map((el: string) => {
           return (
             <option key={el} value={el}>
               {el}

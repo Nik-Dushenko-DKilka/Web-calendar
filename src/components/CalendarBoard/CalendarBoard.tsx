@@ -1,7 +1,8 @@
 import { createContext, useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
+import { useSession } from "next-auth/react";
 
-import Button from "../Button/Button";
+import Button from "../Buttons/Button";
 import DatePicker from "../DatePicker/DatePicker";
 import BoardOfDay from "../Boards/BoardOfDay";
 import BoardOfWeek from "../Boards/BoardOfWeek";
@@ -15,7 +16,6 @@ import {
   saveToLocalStorageWithoutPrevState,
 } from "@/localStorage/localStorage";
 import EventType from "@/types/Event";
-import { useSession } from "next-auth/react";
 
 interface CalendarBoardProps {
   isDayView: boolean;
@@ -58,9 +58,6 @@ const CalendarBoard = ({
   const [editableCalendar, setEditableCalendar] = useState<Calendar>(
     calendars[0]
   );
-
-  const session = useSession();
-  console.log(session);
 
   const calendarsFromStorage: Calendar[] = getFromLocalStorage("calendars");
 
@@ -167,7 +164,7 @@ const CalendarBoard = ({
           <Button
             text="+ Create"
             onClick={() => setEventIsVisible(!eventIsVisible)}
-            style="w-full"
+            styles="w-full"
           />
           <DatePicker
             value={format(currentDate, "yyyy-MM-dd")}
@@ -181,7 +178,7 @@ const CalendarBoard = ({
               <h2 className="font-bold">My calendars</h2>
               <Button
                 icon="/svg/plus-icon.svg"
-                style="border-none dark:bg-transparent dark:invert -mt-2.5 hover:bg-white"
+                styles="border-none dark:bg-transparent dark:invert -mt-2.5 hover:bg-white"
                 isPrimary={false}
                 onClick={createCalendar}
               />
@@ -206,13 +203,13 @@ const CalendarBoard = ({
                     icon={"svg/delete-icon.svg"}
                     onClick={() => deleteCalendar(el.id)}
                     isPrimary={false}
-                    style="border-none dark:bg-transparent dark:invert"
+                    styles="border-none dark:bg-transparent dark:invert"
                   />
                   <Button
                     icon={"svg/edit-icon.svg"}
                     onClick={() => editCalendar(el.name)}
                     isPrimary={false}
-                    style="border-none dark:bg-transparent dark:invert"
+                    styles="border-none dark:bg-transparent dark:invert"
                   />
                 </div>
               );

@@ -9,19 +9,20 @@ import {
 } from "date-fns";
 import Image from "next/image";
 
-import Button from "../Button/Button";
+import Button from "../Buttons/Button";
 import Input from "../Input/Input";
 import SelectMenu from "../SelectMenu/SelectMenu";
 import Checkbox from "../Checkbox/Checkbox";
 import DatePicker from "../DatePicker/DatePicker";
 
-import { RepeatEvents } from "@/enums/RepeatEvents";
 import { saveToLocalStorageWithPrevState } from "@/localStorage/localStorage";
 import Event from "@/types/Event";
 import { Calendar } from "@/types/Calendar";
 import { listOfMinutes } from "@/utils/listOfTime";
 import { ErrorMessage } from "@/types/ErrorMessage";
 import { EditableEventContext } from "../CalendarBoard/CalendarBoard";
+import { NewEvent } from "@/types/NewEvent";
+import { defaultEvent } from "@/constants/defaultEvent";
 
 interface CreateEventProps {
   calendars: Calendar[];
@@ -41,99 +42,87 @@ const CreateEvent = ({
   setVisibility,
 }: CreateEventProps) => {
   const editableEvent = useContext(EditableEventContext)?.currentEvent;
-  const [task, setTask] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [event, setEvent] = useState<Event | null>();
-  const [timestamp, setTimestamp] = useState<number>(getUnixTime(new Date()));
-  const [allDay, setAllDay] = useState<boolean>(false);
-  const [repeat, setRepeat] = useState<string>(RepeatEvents.DOES_NOT_REPEAT);
-  const [calendar, setCalendar] = useState<Calendar>(calendars[0]);
-  const [date, setDate] = useState<string>(
-    format(new Date(), "yyyy-MM-dd").toString()
-  );
   const [errorMessages, setErrorMessages] = useState<Partial<ErrorMessage>>({});
+  const [newEvent, setNewEvent] = useState<NewEvent>({
+    ...defaultEvent,
+    calendar: calendars[0],
+  });
+  const [event, setEvent] = useState<Event | null>();
   const startOfTime = getUnixTime(
-    addHours(startOfDay(fromUnixTime(timestamp)), 5)
+    addHours(startOfDay(fromUnixTime(newEvent.timestamp)), 5)
   );
-  const [time, setTime] = useState<number[]>([startOfTime, startOfTime]);
 
   useEffect(() => {
-    !task.length
-      ? setErrorMessages((prev) => {
-          return { ...prev, title: true };
-        })
-      : setErrorMessages((prev) => {
-          return { ...prev, title: false };
-        });
-
-    time[0] > time[1]
-      ? setErrorMessages((prev) => {
-          return { ...prev, time: true };
-        })
-      : setErrorMessages((prev) => {
-          return { ...prev, time: false };
-        });
-  }, [task, time]);
+    setErrorMessages((prev) => {
+      return {
+        ...prev,
+        time: newEvent.time[0] > newEvent.time[1],
+        title: !newEvent.title.length,
+      };
+    });
+  }, [newEvent.title, newEvent.time]);
 
   useEffect(() => {
-    setTimestamp(
-      getUnixTime(new Date(date + " " + format(fromUnixTime(time[0]), "p")))
-    );
-  }, [time, date]);
-
-  useEffect(() => {
-    if (!editable) {
-      setTime([timestamp, timestamp]);
-    }
-  }, [timestamp]);
+    setNewEvent({
+      ...newEvent,
+      timestamp: getUnixTime(
+        new Date(
+          newEvent.date + " " + format(fromUnixTime(newEvent.time[0]), "p")
+        )
+      ),
+    });
+  }, [newEvent.time, newEvent.date]);
 
   useEffect(() => {
     if (editable && editableEvent) {
-      setTask(editableEvent.title);
-      setDate(
-        format(fromUnixTime(editableEvent.timestamp), "yyyy-MM-dd").toString()
-      );
-      setTime([editableEvent.time[0], editableEvent.time[1]]);
-      setAllDay(editableEvent.allDay);
-      setRepeat(editableEvent.repeat);
-      setCalendar(editableEvent.calendar);
-      setDescription(editableEvent.description);
+      setNewEvent({
+        title: editableEvent.title,
+        date: format(
+          fromUnixTime(editableEvent.timestamp),
+          "yyyy-MM-dd"
+        ).toString(),
+        timestamp: editableEvent.timestamp,
+        time: [editableEvent.time[0], editableEvent.time[1]],
+        allDay: editableEvent.allDay,
+        calendar: editableEvent.calendar,
+        description: editableEvent.description,
+      });
     }
   }, [editableEvent, editable]);
 
   useEffect(() => {
     if (!editable) {
-      setTask("");
-      setDate(format(new Date(), "yyyy-MM-dd"));
-      setTime([startOfTime, startOfTime]);
-      setAllDay(false);
-      setRepeat(RepeatEvents.DOES_NOT_REPEAT);
-      setCalendar(calendars[0]);
-      setDescription("");
+      setNewEvent({
+        ...defaultEvent,
+        time: [startOfTime, startOfTime],
+        calendar: calendars[0],
+      });
     }
-  }, [isVisible, event]);
+  }, [isVisible]);
 
   const selectTime = (
     event: React.ChangeEvent<HTMLSelectElement>,
     isFirstSelect: boolean = false
   ) => {
     const selectedTimeString = event.target.value;
-    const parsedDate = parse(selectedTimeString, "h:mm a", new Date(date));
+    if (!selectedTimeString) {
+      return;
+    }
 
+    const parsedDate = parse(
+      selectedTimeString,
+      "h:mm a",
+      new Date(newEvent.date)
+    );
     const unixTime = getUnixTime(parsedDate);
 
-    if (selectedTimeString) {
-      setTime(
-        isFirstSelect
-          ? [
-              unixTime,
-              editable && editableEvent ? editableEvent.time[1] : startOfTime,
-            ]
-          : [time[0], unixTime]
-      );
-    } else {
-      setTime([startOfTime, startOfTime]);
-    }
+    const currentTime = newEvent.time;
+
+    const updatedTime: [number, number] = isFirstSelect
+      ? [unixTime, currentTime?.[1] ?? unixTime]
+      : [currentTime?.[0] ?? unixTime, unixTime];
+
+    setNewEvent({ ...newEvent, time: updatedTime });
   };
 
   const saveEventData = () => {
@@ -141,15 +130,14 @@ const CreateEvent = ({
       return;
     }
 
-    const newEvent: Event = {
+    const updatedEvent: Event = {
       id: crypto.randomUUID(),
-      title: task,
-      timestamp: timestamp,
-      time: time,
-      allDay: allDay,
-      repeat: repeat,
-      calendar: calendar,
-      description: description,
+      title: newEvent.title,
+      timestamp: newEvent.timestamp,
+      time: newEvent.time,
+      allDay: newEvent.allDay,
+      calendar: newEvent.calendar,
+      description: newEvent.description,
       collisions: 0,
       width: 100,
       leftOffset: 0,
@@ -164,10 +152,12 @@ const CreateEvent = ({
       );
       setEditable && setEditable(false);
     } else {
-      if (!event || event.id !== newEvent.id) {
-        setEvent(newEvent);
-        setEvents((prev: Event[]) => (prev ? [...prev, newEvent] : [newEvent]));
-        saveToLocalStorageWithPrevState(newEvent, "events");
+      if (!event || event.id !== updatedEvent.id) {
+        setEvent(updatedEvent);
+        setEvents((prev: Event[]) =>
+          prev ? [...prev, updatedEvent] : [updatedEvent]
+        );
+        saveToLocalStorageWithPrevState(updatedEvent, "events");
       }
     }
     setVisibility(!isVisible);
@@ -185,7 +175,15 @@ const CreateEvent = ({
     const calendar: Calendar =
       calendars.find((el: Calendar) => el.name === e.target.value) ||
       calendars[0];
-    setCalendar(calendar);
+    setNewEvent({ ...newEvent, calendar: calendar });
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    setter: (item: NewEvent) => void,
+    name: string
+  ) => {
+    setter({ ...newEvent, [name]: e.target.value });
   };
 
   return (
@@ -203,7 +201,7 @@ const CreateEvent = ({
             onClick={closeModal}
             isPrimary={false}
             icon={"/svg/cross-icon.svg"}
-            style="border-none dark:bg-transparent dark:invert"
+            styles="border-none dark:bg-transparent dark:invert"
           />
         }
       </div>
@@ -221,10 +219,8 @@ const CreateEvent = ({
           placeholder="Enter Title"
           type="text"
           isError={errorMessages.title}
-          value={task}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setTask(e.target.value)
-          }
+          value={newEvent.title}
+          onChange={(e) => handleChange(e, setNewEvent, "title")}
         />
       </div>
       <div className="flex flex-row justify-between mt-4">
@@ -238,10 +234,8 @@ const CreateEvent = ({
         <div className="-ml-4">
           <h2>Date</h2>
           <DatePicker
-            value={date}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setDate(e.target.value)
-            }
+            value={newEvent.date}
+            onChange={(e) => handleChange(e, setNewEvent, "date")}
             style="-ml-2 border-none h-1/2 p-0 pl-2"
           />
           <hr className="border-black" />
@@ -251,43 +245,33 @@ const CreateEvent = ({
           options={listOfMinutes}
           style={"self-center"}
           isError={errorMessages.time}
-          isDisabled={allDay ? true : false}
-          defaultValue={format(fromUnixTime(time[0]), "p") ?? "5:00 AM"}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            selectTime(e, true)
+          isDisabled={newEvent.allDay}
+          defaultValue={
+            editable ? format(fromUnixTime(newEvent.time[0]), "p") : "5:00 AM"
           }
+          onChange={(e) => selectTime(e, true)}
         />
         <span className="self-center mt-6">-</span>
         <SelectMenu
           options={listOfMinutes}
           style={"self-center mt-6"}
           isError={errorMessages.time}
-          isDisabled={allDay ? true : false}
-          defaultValue={format(fromUnixTime(time[1]), "p")}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            selectTime(e, false)
-          }
+          isDisabled={newEvent.allDay}
+          defaultValue={format(fromUnixTime(newEvent.time[1]), "p")}
+          onChange={(e) => selectTime(e, false)}
         />
       </div>
       <div className="mt-4 flex flex-row">
         <Checkbox
           checkboxColor="green"
           labelFor="repeat"
-          checked={allDay}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setAllDay(e.target.checked)
+          checked={newEvent.allDay}
+          onChange={(e) =>
+            setNewEvent({ ...newEvent, allDay: e.target.checked })
           }
           text="All day"
           style="ml-[7%]"
         />
-        {/* <SelectMenu
-          defaultValue={editableEvent?.repeat}
-          options={Object.values(RepeatEvents)}
-          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-            setRepeat(e.target.value)
-          }
-          style="ml-6"
-        /> */}
       </div>
       <h3 className="mt-4 ml-8">Calendar</h3>
       <div className="flex flex-row">
@@ -319,22 +303,18 @@ const CreateEvent = ({
         />
         <Input
           title="Description"
-          value={description}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setDescription(e.target.value)
-          }
+          value={newEvent.description}
+          onChange={(e) => handleChange(e, setNewEvent, "description")}
           type="text"
           style="w-full"
         />
       </div>
-      {
-        <Button
-          onClick={saveEventData}
-          isDisabled={errorMessages.title || errorMessages.time ? true : false}
-          text="Save"
-          style="float-right mt-4 w-1/4"
-        />
-      }
+      <Button
+        onClick={saveEventData}
+        isDisabled={errorMessages.title || errorMessages.time}
+        text="Save"
+        styles="float-right mt-4 w-1/4"
+      />
     </section>
   );
 };

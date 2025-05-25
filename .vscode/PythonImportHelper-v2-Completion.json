@@ -1,0 +1,163 @@
+[
+    {
+        "label": "Update",
+        "importPath": "telegram",
+        "description": "telegram",
+        "isExtraImport": true,
+        "detail": "telegram",
+        "documentation": {}
+    },
+    {
+        "label": "CommandHandler",
+        "importPath": "telegram.ext",
+        "description": "telegram.ext",
+        "isExtraImport": true,
+        "detail": "telegram.ext",
+        "documentation": {}
+    },
+    {
+        "label": "MessageHandler",
+        "importPath": "telegram.ext",
+        "description": "telegram.ext",
+        "isExtraImport": true,
+        "detail": "telegram.ext",
+        "documentation": {}
+    },
+    {
+        "label": "ConversationHandler",
+        "importPath": "telegram.ext",
+        "description": "telegram.ext",
+        "isExtraImport": true,
+        "detail": "telegram.ext",
+        "documentation": {}
+    },
+    {
+        "label": "Application",
+        "importPath": "telegram.ext",
+        "description": "telegram.ext",
+        "isExtraImport": true,
+        "detail": "telegram.ext",
+        "documentation": {}
+    },
+    {
+        "label": "CallbackContext",
+        "importPath": "telegram.ext",
+        "description": "telegram.ext",
+        "isExtraImport": true,
+        "detail": "telegram.ext",
+        "documentation": {}
+    },
+    {
+        "label": "filters",
+        "importPath": "telegram.ext",
+        "description": "telegram.ext",
+        "isExtraImport": true,
+        "detail": "telegram.ext",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "db",
+        "description": "db",
+        "detail": "db",
+        "documentation": {}
+    },
+    {
+        "label": "sqlite3",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sqlite3",
+        "description": "sqlite3",
+        "detail": "sqlite3",
+        "documentation": {}
+    },
+    {
+        "label": "FastAPI",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "CORSMiddleware",
+        "importPath": "fastapi.middleware.cors",
+        "description": "fastapi.middleware.cors",
+        "isExtraImport": true,
+        "detail": "fastapi.middleware.cors",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "back-end.bot",
+        "description": "back-end.bot",
+        "peekOfCode": "def main():\n    db.init()\n    application = Application.builder().token(TOKEN).build()\n    conversation_handler = ConversationHandler(\n        entry_points=[CommandHandler('create_event', create_event)],\n        states={\n            'title': [MessageHandler(filters.TEXT & ~filters.COMMAND, get_title)],  # Оновлений фільтр\n            'description': [MessageHandler(filters.TEXT & ~filters.COMMAND, get_description)],  # Оновлений фільтр\n            'time': [MessageHandler(filters.TEXT & ~filters.COMMAND, get_time)],  # Оновлений фільтр\n            'allDay': [MessageHandler(filters.TEXT & ~filters.COMMAND, get_all_day)],  # Оновлений фільтр",
+        "detail": "back-end.bot",
+        "documentation": {}
+    },
+    {
+        "label": "TOKEN",
+        "kind": 5,
+        "importPath": "back-end.bot",
+        "description": "back-end.bot",
+        "peekOfCode": "TOKEN = '8007747642:AAGSonSG8zpVrdezyTc6ZahRLwUA9xcdqD8'\nasync def start(update: Update, context: CallbackContext):\n    await update.message.reply_text(\"Привіт! Щоб створити нову подію, надішли команду /create_event.\")\n    return ConversationHandler.END\nasync def create_event(update: Update, context: CallbackContext):\n    await update.message.reply_text(\"Будь ласка, введи назву події:\")\n    return \"title\"\nasync def get_title(update: Update, context: CallbackContext):\n    context.user_data['title'] = update.message.text\n    await update.message.reply_text(\"Введи опис події:\")",
+        "detail": "back-end.bot",
+        "documentation": {}
+    },
+    {
+        "label": "init",
+        "kind": 2,
+        "importPath": "back-end.db",
+        "description": "back-end.db",
+        "peekOfCode": "def init():\n    conn = sqlite3.connect('events.db')\n    cursor = conn.cursor()\n    cursor.execute('''\n    CREATE TABLE IF NOT EXISTS events (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        title TEXT NOT NULL,\n        time TEXT NOT NULL,\n        allDay BOOLEAN NOT NULL,\n        calendar TEXT NOT NULL,",
+        "detail": "back-end.db",
+        "documentation": {}
+    },
+    {
+        "label": "save_event",
+        "kind": 2,
+        "importPath": "back-end.db",
+        "description": "back-end.db",
+        "peekOfCode": "def save_event(user_data):\n    conn = sqlite3.connect('events.db')\n    cursor = conn.cursor()\n    print(user_data)\n    cursor.execute('''\n    INSERT INTO events (title, description, time, allDay, calendar)\n    VALUES (?, ?, ?, ?, ?)\n    ''', (\n        user_data['title'],\n        user_data['description'],",
+        "detail": "back-end.db",
+        "documentation": {}
+    },
+    {
+        "label": "get_events",
+        "kind": 2,
+        "importPath": "back-end.db",
+        "description": "back-end.db",
+        "peekOfCode": "def get_events():\n    result = []\n    conn = sqlite3.connect('events.db')\n    cursor = conn.cursor()\n    events = cursor.execute('SELECT * FROM events').fetchall()\n    for event in events:\n        result.append(\n            {\n                'title': event[1],\n                'time': event[2],",
+        "detail": "back-end.db",
+        "documentation": {}
+    },
+    {
+        "label": "get_events",
+        "kind": 2,
+        "importPath": "back-end.endpoints",
+        "description": "back-end.endpoints",
+        "peekOfCode": "def get_events():\n    return db.get_events()",
+        "detail": "back-end.endpoints",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "back-end.endpoints",
+        "description": "back-end.endpoints",
+        "peekOfCode": "app = FastAPI()\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)   \n@app.get('/api/get_events')\ndef get_events():",
+        "detail": "back-end.endpoints",
+        "documentation": {}
+    }
+]

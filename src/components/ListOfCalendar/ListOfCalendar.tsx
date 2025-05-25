@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-import Button from "../Button/Button";
+import Button from "../Buttons/Button";
 import ColorPicker from "../ColorPicker/ColorPicker";
 import { colorPalette } from "@/constants/colors";
 import { Calendar } from "@/types/Calendar";
@@ -96,7 +96,7 @@ const ListOfCalendar = ({
           onClick={() => setVisibility(false)}
           isPrimary={false}
           icon={"/svg/cross-icon.svg"}
-          style="border-none dark:bg-transparent dark:invert"
+          styles="border-none dark:bg-transparent dark:invert"
         />
       </div>
       <hr />
@@ -130,7 +130,7 @@ const ListOfCalendar = ({
           setSelectedColor={setSelectColor}
         />
       </div>
-      <Button text="Save" style="float-right mt-2" onClick={saveCalendar} />
+      <Button text="Save" styles="float-right mt-2" onClick={saveCalendar} />
     </div>
   );
 };

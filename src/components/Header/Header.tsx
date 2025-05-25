@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { Mystery_Quest } from "next/font/google";
 
-import Button from "@/components/Button/Button";
+import Button from "@/components/Buttons/Button";
 import Dropdown from "../DropDown/Dropdown";
 import { addDays, addWeeks, format, subDays, subWeeks } from "date-fns";
 import ToggleTheme from "../ToggleTheme/ToggleTheme";
@@ -76,19 +76,19 @@ const Header = ({
           currentDate.getDate() === today.getDate() &&
           currentDate.getMonth() === today.getMonth()
         }
-        style={`h-fit ml-6 self-center`}
+        styles={`h-fit ml-6 self-center`}
       />
       <Button
         icon="/svg/left-icon.svg"
         isPrimary={false}
         onClick={isDayView ? decreaseDay : decreaseMonth}
-        style="h-fit ml-6 self-center"
+        styles="h-fit ml-6 self-center"
       />
       <Button
         icon="/svg/right-icon.svg"
         isPrimary={false}
         onClick={isDayView ? increaseDay : increaseMonth}
-        style="h-fit ml-4 self-center"
+        styles="h-fit ml-4 self-center"
       />
       <div className="block self-center text-xl font-bold">
         <span className="ml-4">

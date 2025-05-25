@@ -2,21 +2,22 @@ import { Calendar } from "@/types/Calendar";
 import Event from "@/types/Event";
 import { listOfHours } from "@/utils/listOfTime";
 import {
-  addDays,
+  eachDayOfInterval,
+  endOfWeek,
   format,
   fromUnixTime,
-  getDate,
   getUnixTime,
-  isSameDay,
   isSameHour,
+  lastDayOfMonth,
   parse,
-  setDate,
+  setHours,
+  startOfWeek,
   subHours,
 } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EventInfo from "../EventInfo/EventInfo";
-import { RepeatEvents } from "@/enums/RepeatEvents";
 import useCalculate from "@/hooks/useCalculate";
+import EventItem from "../EventItem/EventItem";
 
 interface BoardOfDayProps {
   currentDate: Date;
@@ -35,16 +36,58 @@ const BoardOfDay = ({
   setCurrentEvent,
   setVisibilityEdit,
 }: BoardOfDayProps) => {
+  const [daysOfWeek, setDaysOfWeek] = useState(
+    eachDayOfInterval({
+      start: startOfWeek(new Date(currentDate), { weekStartsOn: 1 }),
+      end: endOfWeek(new Date(currentDate), { weekStartsOn: 1 }),
+    })
+  );
+  const [daysInWeek, setDaysInWeek] = useState<number[]>([]);
+  const [startWeek, setStartWeek] = useState<number>(
+    startOfWeek(new Date(currentDate)).getDate()
+  );
+  const [lastDayInMonth, setLastDayInMonth] = useState<number>(
+    lastDayOfMonth(new Date(currentDate)).getDate()
+  );
   const [visibilityInfoModal, setVisibilityInfoModal] =
     useState<boolean>(false);
+  const [updatedEvents, setUpdatedEvents] = useState<Event[]>(events);
 
-  const { calculateHeightPercentage, calculateMinutes } = useCalculate();
+  const { calculateCollisions } = useCalculate();
 
-  const calculateId = (el: string) => {
+  useEffect(() => {
+    setStartWeek(startOfWeek(new Date(currentDate)).getDate());
+    setLastDayInMonth(lastDayOfMonth(new Date(currentDate)).getDate());
+    setDaysOfWeek(
+      eachDayOfInterval({
+        start: new Date(startOfWeek(new Date(currentDate))),
+        end: new Date(endOfWeek(new Date(currentDate))),
+      })
+    );
+    setDaysInWeek([]);
+  }, [currentDate]);
+
+  useEffect(() => {
+    //7 is a week
+    for (let i = 0; i < 7; i++) {
+      const day =
+        startWeek + i <= lastDayInMonth
+          ? startWeek + i
+          : startWeek + i - lastDayInMonth;
+      setDaysInWeek((prev) => [...prev, day]);
+    }
+  }, [startWeek]);
+
+  useEffect(() => {
+    const updatedEvents = calculateCollisions(events);
+    setUpdatedEvents(updatedEvents);
+  }, [events, currentDate]);
+
+  const calculateId = (el: string): number => {
     const parsedTime = parse(el, "h a", new Date(currentDate));
-    const dayOfWeekDate = setDate(parsedTime, getDate(currentDate));
+    const dayWithTime = setHours(new Date(currentDate), parsedTime.getHours());
 
-    return getUnixTime(subHours(dayOfWeekDate, 1));
+    return getUnixTime(subHours(dayWithTime, 1));
   };
 
   const updateCurrentEvent = (el: Event) => {
@@ -56,81 +99,19 @@ const BoardOfDay = ({
 
   const isEventOnDay = (event: Event, id: number): boolean => {
     const eventStartDate = new Date(event.timestamp * 1000);
-    const halfYear = addDays(eventStartDate, 182);
-
-    if (!event.repeat || event.repeat === RepeatEvents.DOES_NOT_REPEAT) {
-      return isSameHour(eventStartDate, fromUnixTime(id));
-    }
-
-    if (event.repeat === RepeatEvents.DAILY) {
-      return (
-        (eventStartDate.getHours() === fromUnixTime(id).getHours() &&
-          getUnixTime(eventStartDate) <= id &&
-          getUnixTime(currentDate) <= getUnixTime(halfYear)) ||
-        (isSameDay(eventStartDate, fromUnixTime(id)) &&
-          isSameHour(eventStartDate, fromUnixTime(id)))
-      );
-    }
-
-    if (event.repeat === RepeatEvents.MONTHLY) {
-      return (
-        eventStartDate.getHours() === fromUnixTime(id).getHours() &&
-        eventStartDate.getDate() === fromUnixTime(id).getDate() &&
-        getUnixTime(currentDate) <= getUnixTime(halfYear)
-      );
-    }
-
-    return false;
-  };
-
-  const calculateWidth = (timestamp: number) => {
-    const eventDate = fromUnixTime(timestamp);
-    const eventCount = events.reduce((accumulate, el: Event) => {
-      const elDate = fromUnixTime(el.timestamp);
-
-      if (
-        elDate.getDate() === eventDate.getDate() &&
-        elDate.getMonth() === eventDate.getMonth()
-      ) {
-        return accumulate + 1;
-      }
-
-      return accumulate;
-    }, 0);
-    const width = eventCount > 0 ? 100 / eventCount : 100;
-
-    return `${width}%`;
-  };
-
-  const calculateLeft = (event: Event) => {
-    const eventsOnSameDayAndHour = events.filter(
-      (el: Event) =>
-        fromUnixTime(el.timestamp).getDate() ===
-          fromUnixTime(event.timestamp).getDate() &&
-        fromUnixTime(el.timestamp).getMonth() ===
-          fromUnixTime(event.timestamp).getMonth()
-    );
-
-    const eventIndex = eventsOnSameDayAndHour.findIndex(
-      (el: Event) => el.id === event.id
-    );
-
-    const left = (eventIndex / eventsOnSameDayAndHour.length) * 100;
-
-    return `${left}%`;
+    return isSameHour(eventStartDate, fromUnixTime(id));
   };
 
   return (
     <>
-      {
-        <EventInfo
-          events={events}
-          isVisible={visibilityInfoModal}
-          setEditable={setEditable}
-          setVisibilityEdit={setVisibilityEdit}
-          setVisibility={setVisibilityInfoModal}
-        />
-      }
+      <EventInfo
+        events={events}
+        isVisible={visibilityInfoModal}
+        setEditable={setEditable}
+        setVisibilityEdit={setVisibilityEdit}
+        setVisibility={setVisibilityInfoModal}
+      />
+
       <section className="w-full h-fit rounded-lg bg-white dark:bg-darkSub">
         <div className="flex border-b-2 shadow-md">
           <div className="w-[12%] border-r-2"></div>
@@ -139,11 +120,12 @@ const BoardOfDay = ({
             <span className="font-bold">{format(currentDate, "EEEE")}</span>
           </div>
         </div>
+
         <section className="overflow-y-scroll no-scrollbar h-[79vh]">
           {listOfHours.map((time: string) => {
             const id = calculateId(time);
             return (
-              <div className="flex" key={crypto.randomUUID()}>
+              <div className="flex relative" key={crypto.randomUUID()}>
                 <span className="text-center h-28 w-[13.4%] flex items-end justify-center -mb-2">
                   {time}
                 </span>
@@ -151,37 +133,25 @@ const BoardOfDay = ({
                   <div
                     className="border-b-2 border-l-2 w-full relative"
                     id={id.toString()}
-                    key={crypto.randomUUID()}
                   >
-                    {events?.map((el: Event) => {
+                    {updatedEvents?.map((el: Event) => {
                       if (isEventOnDay(el, id) && el.calendar.isVisible) {
                         const currentCalendar: Calendar =
                           calendars.find(
                             (calendar) => calendar.name === el.calendar.name
                           ) || calendars[0];
+
                         return (
-                          <div
+                          <EventItem
                             key={crypto.randomUUID()}
-                            className={`bg-opacity-50 absolute rounded-lg p-2 z-40 cursor-pointer overflow-y-hidden ${calculateMinutes(
-                              el.timestamp
-                            )}`}
-                            style={{
-                              width: calculateWidth(id),
-                              height: calculateHeightPercentage(
-                                el.time[0],
-                                el.time[1],
-                                el.allDay
-                              ),
-                              left: calculateLeft(el),
-                              backgroundColor: currentCalendar?.color,
-                            }}
-                            onClick={() => updateCurrentEvent(el)}
-                          >
-                            <h2>{el.title}</h2>
-                            <span className="text-sm">{el.description}</span>
-                          </div>
+                            el={el}
+                            events={updatedEvents}
+                            updateCurrentEvent={updateCurrentEvent}
+                            currentCalendar={currentCalendar}
+                          />
                         );
                       }
+                      return null;
                     })}
                   </div>
                 </div>

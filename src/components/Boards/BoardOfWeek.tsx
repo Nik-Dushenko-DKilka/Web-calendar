@@ -2,25 +2,20 @@ import { useEffect, useState } from "react";
 import {
   eachDayOfInterval,
   endOfWeek,
-  format,
   lastDayOfMonth,
   startOfWeek,
   getUnixTime,
   parse,
-  EachDayOfIntervalResult,
   subHours,
-  addDays,
   isSameHour,
   fromUnixTime,
   setHours,
-  isSameDay,
 } from "date-fns";
 
 import { Calendar } from "@/types/Calendar";
 import Event from "@/types/Event";
 import EventInfo from "../EventInfo/EventInfo";
 import { listOfHours } from "@/utils/listOfTime";
-import { RepeatEvents } from "@/enums/RepeatEvents";
 import useCalculate from "@/hooks/useCalculate";
 import EventItem from "../EventItem/EventItem";
 import HeaderOfBoard from "../HeaderOfBoard/HeaderOfBoard";
@@ -48,9 +43,6 @@ const BoardOfWeek = ({
       end: endOfWeek(new Date(currentDate), { weekStartsOn: 1 }),
     })
   );
-  const weekdays: string[] = daysOfWeek.map((day) =>
-    format(addDays(day, 1), "EEE")
-  );
   const [daysInWeek, setDaysInWeek] = useState<number[]>([]);
   const [startWeek, setStartWeek] = useState<number>(
     startOfWeek(new Date(currentDate)).getDate()
@@ -61,8 +53,18 @@ const BoardOfWeek = ({
   const [visibilityInfoModal, setVisibilityInfoModal] =
     useState<boolean>(false);
   const [updatedEvents, setUpdatedEvents] = useState<Event[]>(events);
+  const [eventsFromDB, setEventsFromDB] = useState();
 
   const { calculateCollisions } = useCalculate();
+
+  useEffect(() => {
+    (async () => {
+      const response = await (
+        await fetch("http://127.0.0.1:8000/api/get_events")
+      ).json();
+      setEventsFromDB(response);
+    })();
+  }, []);
 
   useEffect(() => {
     setStartWeek(startOfWeek(new Date(currentDate)).getDate());
@@ -93,7 +95,7 @@ const BoardOfWeek = ({
   }, [events, currentDate]);
 
   const calculateId = (el: string, index: number) => {
-    const currentDay = daysOfWeek[index + 1];
+    const currentDay = daysOfWeek[index];
     const parsedTime = parse(el, "h a", new Date(currentDate));
     const dayOfWeekDate = setHours(currentDay, parsedTime.getHours());
 
@@ -109,49 +111,7 @@ const BoardOfWeek = ({
 
   const isEventOnDay = (event: Event, id: number): boolean => {
     const eventStartDate = new Date(event.timestamp * 1000);
-    const halfYear = addDays(eventStartDate, 10);
-
-    if (!event.repeat || event.repeat === RepeatEvents.DOES_NOT_REPEAT) {
-      return isSameHour(eventStartDate, fromUnixTime(id));
-    }
-
-    if (event.repeat === RepeatEvents.DAILY) {
-      const repeatID =
-        (eventStartDate.getHours() === fromUnixTime(id).getHours() &&
-          getUnixTime(eventStartDate) <= id &&
-          getUnixTime(currentDate) <= getUnixTime(halfYear)) ||
-        (isSameDay(eventStartDate, fromUnixTime(id)) &&
-          isSameHour(eventStartDate, fromUnixTime(id)));
-      if (repeatID) {
-        const daysDifference =
-          fromUnixTime(id).getDate() - eventStartDate.getDate();
-        const updatedTimestamp = getUnixTime(
-          addDays(new Date(event.timestamp * 1000), daysDifference)
-        );
-        event.repeatID = `${event.id}_${updatedTimestamp}`;
-      }
-
-      event.repeatID = crypto.randomUUID();
-      console.log(event.repeatID);
-
-      return (
-        (eventStartDate.getHours() === fromUnixTime(id).getHours() &&
-          getUnixTime(eventStartDate) <= id &&
-          getUnixTime(currentDate) <= getUnixTime(halfYear)) ||
-        (isSameDay(eventStartDate, fromUnixTime(id)) &&
-          isSameHour(eventStartDate, fromUnixTime(id)))
-      );
-    }
-
-    if (event.repeat === RepeatEvents.MONTHLY) {
-      return (
-        eventStartDate.getHours() === fromUnixTime(id).getHours() &&
-        eventStartDate.getDate() === fromUnixTime(id).getDate() &&
-        getUnixTime(currentDate) <= getUnixTime(halfYear)
-      );
-    }
-
-    return false;
+    return isSameHour(eventStartDate, fromUnixTime(id));
   };
 
   return (
@@ -196,7 +156,6 @@ const BoardOfWeek = ({
                               calendars.find(
                                 (calendar) => calendar.name === el.calendar.name
                               ) || calendars[0];
-                            // const day = format(fromUnixTime(id), "P");
                             return (
                               <EventItem
                                 key={crypto.randomUUID()}
