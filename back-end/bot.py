@@ -5,7 +5,7 @@ from datetime import datetime
 
 import db
 
-TOKEN = '8007747642:AAGSonSG8zpVrdezyTc6ZahRLwUA9xcdqD8'
+TOKEN = f'{secrets.TG_TOKEN}'
 
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("Привіт! Щоб створити нову подію, надішли команду /create_event.")

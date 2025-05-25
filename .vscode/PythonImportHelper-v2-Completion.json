@@ -111,7 +111,7 @@
         "kind": 5,
         "importPath": "back-end.bot",
         "description": "back-end.bot",
-        "peekOfCode": "TOKEN = '8007747642:AAGSonSG8zpVrdezyTc6ZahRLwUA9xcdqD8'\nasync def start(update: Update, context: CallbackContext):\n    await update.message.reply_text(\"Привіт! Щоб створити нову подію, надішли команду /create_event.\")\n    return ConversationHandler.END\nasync def create_event(update: Update, context: CallbackContext):\n    await update.message.reply_text(\"Будь ласка, введи назву події:\")\n    return \"title\"\nasync def get_title(update: Update, context: CallbackContext):\n    context.user_data['title'] = update.message.text\n    await update.message.reply_text(\"Введи опис події:\")",
+        "peekOfCode": "TOKEN = f'{secrets.TG_TOKEN}'\nasync def start(update: Update, context: CallbackContext):\n    await update.message.reply_text(\"Привіт! Щоб створити нову подію, надішли команду /create_event.\")\n    return ConversationHandler.END\nasync def create_event(update: Update, context: CallbackContext):\n    await update.message.reply_text(\"Будь ласка, введи назву події:\")\n    return \"title\"\nasync def get_title(update: Update, context: CallbackContext):\n    context.user_data['title'] = update.message.text\n    await update.message.reply_text(\"Введи опис події:\")",
         "detail": "back-end.bot",
         "documentation": {}
     },
