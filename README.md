@@ -47,6 +47,18 @@ npm start
 
 This will build the application and start it in production mode on port 3000.
 
+### 5. Run the FastAPI backend
+
+```bash
+python endpoints.py
+```
+
+### 6. Run the Python bot
+
+```bash
+python bot.py
+```
+
 ## ✅ Available Scripts
 
 | Command         | Description                     |
@@ -55,7 +67,3 @@ This will build the application and start it in production mode on port 3000.
 | `npm run build` | Build the app for production    |
 | `npm start`     | Run the built app in production |
 | `npm run lint`  | Run ESLint to check for issues  |
-
-## 📁 Project Structure
-
-> The project structure may vary depending on your implementation. You can expand this section to explain the folder organization, components, pages, etc.
