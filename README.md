@@ -56,6 +56,3 @@ This will build the application and start it in production mode on port 3000.
 | `npm start`     | Run the built app in production |
 | `npm run lint`  | Run ESLint to check for issues  |
 
-## 📁 Project Structure
-
-> The project structure may vary depending on your implementation. You can expand this section to explain the folder organization, components, pages, etc.
